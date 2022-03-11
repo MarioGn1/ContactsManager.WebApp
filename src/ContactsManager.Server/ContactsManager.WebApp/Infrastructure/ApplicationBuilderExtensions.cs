@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ContactsManager.Infrastructure
+namespace ContactsManager.WebApp.Infrastructure
 {
     public static class ApplicationBuilderExtensions
     {
@@ -12,10 +12,6 @@ namespace ContactsManager.Infrastructure
             using var scopedServices = app.ApplicationServices.CreateScope();
 
             var data = scopedServices.ServiceProvider.GetService<ContactsManagerDbContext>();
-
-            //var userManager = scopedServices.ServiceProvider.GetService<UserManager<AppUser>>();
-
-            //var roleManager = scopedServices.ServiceProvider.GetService<RoleManager<IdentityRole>>();
 
             data.Database.Migrate();
 

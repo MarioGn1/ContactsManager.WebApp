@@ -8,4 +8,8 @@
     <ProjectReference Include="..\ContactsManager.Data\ContactsManager.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="IdentityService\" />
+  </ItemGroup>
+
 </Project>

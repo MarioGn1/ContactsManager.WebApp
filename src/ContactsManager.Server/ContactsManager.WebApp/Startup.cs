@@ -1,6 +1,6 @@
 using ContactsManager.Data;
 using ContactsManager.Data.Models;
-using ContactsManager.Infrastructure;
+using ContactsManager.WebApp.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -42,34 +42,8 @@ namespace ContactsManager.WebApp
 
             services
                 .AddCors()
+                .AddJwtAuthentication(Configuration)
                 .AddControllers();
-
-            var appSettingsConfig = Configuration.GetSection("AppSettings");
-            services.Configure<ApplicationSettings>(appSettingsConfig);
-
-            var appSettings = appSettingsConfig.Get<ApplicationSettings>();
-            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
-
-            services
-                .AddAuthentication(options =>
-                {
-                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                })
-                .AddJwtBearer(options =>
-                {
-                    options.RequireHttpsMetadata = false;
-                    options.SaveToken = true;
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(key),
-                        ValidateIssuer = false,
-                        ValidateAudience = false
-                    };
-                });
-
-            
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
