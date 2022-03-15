@@ -10,5 +10,12 @@ namespace ContactsManager.Data
             : base(options)
         {
         }
+
+        public DbSet<Contact> Contacts { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+        }
     }
 }
