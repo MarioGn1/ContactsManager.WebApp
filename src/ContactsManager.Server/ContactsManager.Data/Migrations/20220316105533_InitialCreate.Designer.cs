@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ContactsManager.Data.Migrations
 {
     [DbContext(typeof(ContactsManagerDbContext))]
-    [Migration("20220312125954_ContactsTableNameChanged")]
-    partial class ContactsTableNameChanged
+    [Migration("20220316105533_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -24,12 +24,21 @@ namespace ContactsManager.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.HasSequence("bookseq")
+                .IncrementsBy(10);
+
+            modelBuilder.HasSequence("contactseq")
+                .IncrementsBy(10);
+
             modelBuilder.Entity("ContactsManager.Data.Models.AppUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BookId")
                         .HasColumnType("int");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -78,6 +87,9 @@ namespace ContactsManager.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BookId")
+                        .IsUnique();
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -89,40 +101,63 @@ namespace ContactsManager.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("ContactsManager.Data.Models.Contact", b =>
+            modelBuilder.Entity("ContactsManager.Domain.AggregateModel.ContactsAggregate.Book", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FirstName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("IBAN")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Surname")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                    SqlServerPropertyBuilderExtensions.UseHiLo(b.Property<int>("Id"), "bookseq");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.ToTable("books", (string)null);
+                });
 
-                    b.ToTable("Contacts");
+            modelBuilder.Entity("ContactsManager.Domain.AggregateModel.ContactsAggregate.Contact", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseHiLo(b.Property<int>("Id"), "contactseq");
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("DateOfBirth");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)")
+                        .HasColumnName("FirstName");
+
+                    b.Property<string>("Iban")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)")
+                        .HasColumnName("IBAN");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)")
+                        .HasColumnName("LastName");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)")
+                        .HasColumnName("PhoneNumber");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookId");
+
+                    b.ToTable("contacts", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -258,13 +293,66 @@ namespace ContactsManager.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("ContactsManager.Data.Models.Contact", b =>
+            modelBuilder.Entity("ContactsManager.Data.Models.AppUser", b =>
                 {
-                    b.HasOne("ContactsManager.Data.Models.AppUser", "User")
-                        .WithMany("Contacts")
-                        .HasForeignKey("UserId");
+                    b.HasOne("ContactsManager.Domain.AggregateModel.ContactsAggregate.Book", "Book")
+                        .WithOne()
+                        .HasForeignKey("ContactsManager.Data.Models.AppUser", "BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("Book");
+                });
+
+            modelBuilder.Entity("ContactsManager.Domain.AggregateModel.ContactsAggregate.Contact", b =>
+                {
+                    b.HasOne("ContactsManager.Domain.AggregateModel.ContactsAggregate.Book", null)
+                        .WithMany("Contacts")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.OwnsOne("ContactsManager.Domain.AggregateModel.ContactsAggregate.Address", "Address", b1 =>
+                        {
+                            b1.Property<int>("ContactId")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int");
+
+                            SqlServerPropertyBuilderExtensions.UseHiLo(b1.Property<int>("ContactId"), "contactseq");
+
+                            b1.Property<string>("City")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("nvarchar(50)");
+
+                            b1.Property<string>("Country")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("nvarchar(50)");
+
+                            b1.Property<string>("State")
+                                .HasMaxLength(50)
+                                .HasColumnType("nvarchar(50)");
+
+                            b1.Property<string>("Street")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("nvarchar(50)");
+
+                            b1.Property<string>("ZipCode")
+                                .IsRequired()
+                                .HasMaxLength(10)
+                                .HasColumnType("nvarchar(10)");
+
+                            b1.HasKey("ContactId");
+
+                            b1.ToTable("contacts");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ContactId");
+                        });
+
+                    b.Navigation("Address");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -318,7 +406,7 @@ namespace ContactsManager.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ContactsManager.Data.Models.AppUser", b =>
+            modelBuilder.Entity("ContactsManager.Domain.AggregateModel.ContactsAggregate.Book", b =>
                 {
                     b.Navigation("Contacts");
                 });

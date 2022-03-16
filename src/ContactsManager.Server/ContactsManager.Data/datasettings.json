@@ -1,5 +1,5 @@
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=.;Database=ContactsManager.WebApp;Trusted_Connection=True;MultipleActiveResultSets=true"
+    "DefaultConnection": "Server=.;Database=ContactsManager;Trusted_Connection=True;MultipleActiveResultSets=true"
   }
 }

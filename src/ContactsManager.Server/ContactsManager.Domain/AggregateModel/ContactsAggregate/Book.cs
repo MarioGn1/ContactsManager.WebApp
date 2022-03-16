@@ -7,41 +7,45 @@ namespace ContactsManager.Domain.AggregateModel.ContactsAggregate
 {
     public class Book : Entity, IAggregateRoot
     {
-        public string OwnerId { get; private set; }
-        private readonly List<Contact> contacts;
-        public IReadOnlyCollection<Contact> Contacts => contacts;
+        private readonly HashSet<Contact> contacts;
 
-        public Book(string ownerId)
+        public IReadOnlyCollection<Contact> Contacts 
+            => contacts
+                .OrderBy(x => x.FirstName)
+                .ToList();
+
+        public Book()
         {
-            OwnerId = ownerId;
-            contacts = new List<Contact>();
+            contacts = new HashSet<Contact>();
         }
+
 
         public Contact GetById(int contactId)
         {
-            return this.contacts.Find(x => x.Id == contactId);
+            return this.contacts.FirstOrDefault(x => x.Id == contactId);
         }
 
         public IReadOnlyCollection<Contact> GetByName(string name)
         {
             var contacts = this.contacts
                 .Where(x => x.FirstName == name || x.LastName == name)
+                .OrderBy(x => x.FirstName)
                 .ToList()
                 .AsReadOnly();
 
             return Contacts;
         }
 
-        public Contact Add(string firstName, 
-            string lastName, 
+        public Contact Create(int bookId, string firstName,
+            string lastName,
             DateTime dateOfBirth,
-            string street, string city, string state, string country, string zipcode, 
-            string phoneNumber, 
+            string street, string city, string state, string country, string zipcode,
+            string phoneNumber,
             string IBAN)
         {
             Address address = new Address(street, city, state, country, zipcode);
 
-            Contact contact = new Contact(firstName, lastName, dateOfBirth, address, phoneNumber, IBAN);
+            Contact contact = new Contact(bookId, firstName, lastName, dateOfBirth, address, phoneNumber, IBAN);
             this.contacts.Add(contact);
 
             return contact;
@@ -57,13 +61,13 @@ namespace ContactsManager.Domain.AggregateModel.ContactsAggregate
         {
             Address address = new Address(street, city, state, country, zipcode);
 
-            var contact = contacts.Find(x => x.Id == contactId);
+            var contact = this.contacts.FirstOrDefault(x => x.Id == contactId);
             contact.Update(firstName, lastName, dateOfBirth, address, phoneNumber, IBAN);
         }
 
         public void Delete(int contactId)
         {
-            var contact = contacts.Find(x => x.Id == contactId);
+            var contact = this.contacts.FirstOrDefault(x => x.Id == contactId);
             this.contacts.Remove(contact);
         }
     }

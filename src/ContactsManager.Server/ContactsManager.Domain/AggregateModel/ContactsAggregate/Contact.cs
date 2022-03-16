@@ -6,6 +6,7 @@ namespace ContactsManager.Domain.AggregateModel.ContactsAggregate
 {
     public class Contact : Entity
     {
+        private int bookId;
         private string firstName;
         private string lastName;
         private DateTime dateOfBirth;
@@ -13,14 +14,18 @@ namespace ContactsManager.Domain.AggregateModel.ContactsAggregate
         private string phoneNumber;
         private string iban;
 
-        public Contact(string firstName, string lastName, DateTime dateOfBirth, Address address, string phoneNumber, string IBAN)
+        public Contact()
+        { }
+
+        public Contact(int bookId, string firstName, string lastName, DateTime dateOfBirth, Address address, string phoneNumber, string IBAN)
         {
+            BookId = bookId;
             FirstName = firstName;
             LastName = lastName;
             DateOfBirth = dateOfBirth;
             Address = address;
             PhoneNumber = phoneNumber;
-            this.IBAN = IBAN;
+            this.Iban = IBAN;
         }
 
         public string FirstName
@@ -86,16 +91,22 @@ namespace ContactsManager.Domain.AggregateModel.ContactsAggregate
             }
         }
 
-        public string IBAN
+        public string Iban
         {
             get { return iban; }
             private set 
             {
                 //Regex match for Germany, could be extracted to resourse file or config file
                 var patern = @"^DE\d{20}$";
-                IsValid(value, patern, nameof(IBAN));
+                IsValid(value, patern, nameof(Iban));
                 iban = value; 
             }
+        }
+
+        public int BookId 
+        {
+            get => bookId;
+            private set => bookId = value; 
         }
 
         public void Update(string firstName, string lastName, DateTime dateOfBirth, Address address, string phoneNumber, string IBAN)
@@ -105,7 +116,7 @@ namespace ContactsManager.Domain.AggregateModel.ContactsAggregate
             DateOfBirth = dateOfBirth;
             Address = address;
             PhoneNumber = phoneNumber;
-            this.IBAN = IBAN;
+            this.Iban = IBAN;
         }
 
         private static void IsValid(string value, string patern, string propertyName)
