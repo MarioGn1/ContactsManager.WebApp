@@ -1,3 +1,9 @@
+using ContactsManager.Application.Commands;
+using ContactsManager.Application.Interfaces.Commands;
+using ContactsManager.Application.Interfaces.Queries;
+using ContactsManager.Application.Queries;
+using ContactsManager.Application.Queries.GetById;
+using ContactsManager.Application.Queries.GetByName;
 using ContactsManager.Data;
 using ContactsManager.Data.Models;
 using ContactsManager.WebApp.Infrastructure;
@@ -41,6 +47,17 @@ namespace ContactsManager.WebApp
                 .AddCors()
                 .AddJwtAuthentication(Configuration)
                 .AddControllers();
+
+
+            //Add Query Handlers
+            services
+                .AddScoped<IQueryHandler<GetByNameQuery>, GetByNameQueryHandler>()
+                .AddScoped<ISingleResultQueryHandler<GetByIdQuery>, GetByIdQueryHandler>();
+
+            //Add Dispatchers
+            services
+                .AddScoped<ICommandDispatcher, CommandDispatcher>()
+                .AddScoped<IQueryDispatcher, QueryDispatcher>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

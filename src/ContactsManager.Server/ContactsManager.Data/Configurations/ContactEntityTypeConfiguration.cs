@@ -1,7 +1,6 @@
 ﻿using ContactsManager.Domain.AggregateModel.ContactsAggregate;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
 
 namespace ContactsManager.Data.Configurations
 {

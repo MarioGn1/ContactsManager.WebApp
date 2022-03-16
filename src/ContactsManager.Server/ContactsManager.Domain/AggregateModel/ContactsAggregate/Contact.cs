@@ -2,6 +2,9 @@
 using System;
 using System.Text.RegularExpressions;
 
+using static ContactsManager.Constants.Domain.Contact;
+using static ContactsManager.Constants.Domain.ExeptionMessages;
+
 namespace ContactsManager.Domain.AggregateModel.ContactsAggregate
 {
     public class Contact : Entity
@@ -17,7 +20,13 @@ namespace ContactsManager.Domain.AggregateModel.ContactsAggregate
         public Contact()
         { }
 
-        public Contact(int bookId, string firstName, string lastName, DateTime dateOfBirth, Address address, string phoneNumber, string IBAN)
+        public Contact(int bookId,
+            string firstName,
+            string lastName,
+            DateTime dateOfBirth,
+            Address address,
+            string phoneNumber,
+            string IBAN)
         {
             BookId = bookId;
             FirstName = firstName;
@@ -31,24 +40,24 @@ namespace ContactsManager.Domain.AggregateModel.ContactsAggregate
         public string FirstName
         {
             get { return firstName; }
-            private set 
+            private set
             {
                 if (string.IsNullOrEmpty(value) || value.Length < 3)
                 {
-                    throw new ContactsException("First name could not be null or empty string and must be at least 3 simbols long.");
+                    throw new ContactsException(FIRST_NAME_REQUIRED);
                 }
-                firstName = value; 
+                firstName = value;
             }
         }
 
         public string LastName
         {
             get { return lastName; }
-            private set 
+            private set
             {
                 if (string.IsNullOrEmpty(value) || value.Length < 3)
                 {
-                    throw new ContactsException("Last name could not be null or empty string and must be at least 3 simbols long.");
+                    throw new ContactsException(LAST_NAME_REQUIRED);
                 }
                 lastName = value;
             }
@@ -57,26 +66,26 @@ namespace ContactsManager.Domain.AggregateModel.ContactsAggregate
         public DateTime DateOfBirth
         {
             get { return dateOfBirth; }
-            private set 
-            { 
-                if(value > DateTime.Now || value < DateTime.Now.AddYears(120))
+            private set
+            {
+                if (value > DateTime.Now || value < DateTime.Now.AddYears(-120))
                 {
-                    throw new ContactsException("Invalid date.");
+                    throw new ContactsException(INVALID_DATE_OF_BIRTH);
                 }
-                dateOfBirth = value; 
+                dateOfBirth = value;
             }
         }
 
         public Address Address
         {
             get { return address; }
-            private set 
+            private set
             {
                 if (value == null)
                 {
-                    throw new ContactsException("Address could not be null.");
+                    throw new ContactsException(ADDRESS_REQUIRED);
                 }
-                address = value; 
+                address = value;
             }
         }
 
@@ -85,7 +94,7 @@ namespace ContactsManager.Domain.AggregateModel.ContactsAggregate
             get { return phoneNumber; }
             private set
             {
-                var patern = @"^(\+\d{1,3}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-](\d{4}|\d{3})$|^\d{6,10}$|^\+\d{6,12}$";
+                var patern = PHONE_NUMBER_PATERN;
                 IsValid(value, patern, nameof(PhoneNumber));
                 phoneNumber = value;
             }
@@ -94,22 +103,27 @@ namespace ContactsManager.Domain.AggregateModel.ContactsAggregate
         public string Iban
         {
             get { return iban; }
-            private set 
+            private set
             {
                 //Regex match for Germany, could be extracted to resourse file or config file
-                var patern = @"^DE\d{20}$";
+                var patern = IBAN_PATERN;
                 IsValid(value, patern, nameof(Iban));
-                iban = value; 
+                iban = value;
             }
         }
 
-        public int BookId 
+        public int BookId
         {
             get => bookId;
-            private set => bookId = value; 
+            private set => bookId = value;
         }
 
-        public void Update(string firstName, string lastName, DateTime dateOfBirth, Address address, string phoneNumber, string IBAN)
+        public void Update(string firstName,
+            string lastName,
+            DateTime dateOfBirth,
+            Address address,
+            string phoneNumber,
+            string IBAN)
         {
             FirstName = firstName;
             LastName = lastName;
@@ -126,7 +140,7 @@ namespace ContactsManager.Domain.AggregateModel.ContactsAggregate
 
             if (matches.Count == 0)
             {
-                throw new ContactsException($"Invalid {propertyName}.");
+                throw new ContactsException(String.Format(INVALID_PROPERTY, propertyName));
             }
         }
     }

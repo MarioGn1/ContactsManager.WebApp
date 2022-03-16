@@ -5,11 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ContactsManager.Data\ContactsManager.Data.csproj" />
+    <PackageReference Include="FluentValidation" Version="10.4.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="IdentityService\" />
+    <ProjectReference Include="..\ContactsManager.Data\ContactsManager.Data.csproj" />
   </ItemGroup>
 
 </Project>

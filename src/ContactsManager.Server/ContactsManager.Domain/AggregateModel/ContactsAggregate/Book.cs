@@ -36,7 +36,7 @@ namespace ContactsManager.Domain.AggregateModel.ContactsAggregate
             return Contacts;
         }
 
-        public Contact Create(int bookId, string firstName,
+        public Contact Create(string firstName,
             string lastName,
             DateTime dateOfBirth,
             string street, string city, string state, string country, string zipcode,
@@ -45,7 +45,7 @@ namespace ContactsManager.Domain.AggregateModel.ContactsAggregate
         {
             Address address = new Address(street, city, state, country, zipcode);
 
-            Contact contact = new Contact(bookId, firstName, lastName, dateOfBirth, address, phoneNumber, IBAN);
+            Contact contact = new Contact(this.Id, firstName, lastName, dateOfBirth, address, phoneNumber, IBAN);
             this.contacts.Add(contact);
 
             return contact;
