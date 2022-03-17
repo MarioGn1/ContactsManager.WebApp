@@ -5,6 +5,7 @@ using ContactsManager.Application.Commands.UpdateContact;
 using ContactsManager.Application.Interfaces.Commands;
 using ContactsManager.Application.Interfaces.Queries;
 using ContactsManager.Application.Queries;
+using ContactsManager.Application.Queries.GetAll;
 using ContactsManager.Application.Queries.GetById;
 using ContactsManager.Application.Queries.GetByName;
 using ContactsManager.Data;
@@ -60,6 +61,7 @@ namespace ContactsManager.WebApp
 
             //Add Query Handlers
             services
+                .AddScoped<IQueryHandler<GetAllQuery>, GetAllQueryHandler>()
                 .AddScoped<IQueryHandler<GetByNameQuery>, GetByNameQueryHandler>()
                 .AddScoped<ISingleResultQueryHandler<GetByIdQuery>, GetByIdQueryHandler>();
 

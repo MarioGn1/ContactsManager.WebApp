@@ -5,6 +5,7 @@ using ContactsManager.Application.Exceptions;
 using ContactsManager.Application.Interfaces.Commands;
 using ContactsManager.Application.Interfaces.Queries;
 using ContactsManager.Application.Queries;
+using ContactsManager.Application.Queries.GetAll;
 using ContactsManager.Application.Queries.GetById;
 using ContactsManager.Application.Queries.GetByName;
 using ContactsManager.Data.Models;
@@ -39,10 +40,17 @@ namespace ContactsManager.WebApp.Controllers
 
 
         [HttpGet]
-        [Route("all")]
         public ActionResult<string> GetAll()
         {
-            return Ok("Thats cool at all!");
+            var userId = GetUserId();
+            var result = queryDispatcher.Send(new GetAllQuery { OwnerId = userId});
+            List<ContactDisplay> response = new List<ContactDisplay>();
+            if (result != null && result.Count > 0)
+                foreach (var member in result)
+                {
+                    response.Add((ContactDisplay)member);
+                }
+            return Ok(response);
         }
 
         [HttpGet]
