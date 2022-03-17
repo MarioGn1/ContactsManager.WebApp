@@ -29,7 +29,7 @@ namespace ContactsManager.Application.Commands.AddContact
                 .Matches(IBAN_PATERN).WithMessage("IBAN format is wrong");
 
             RuleFor(p => p.DateOfBirth)
-                .GreaterThan(DateTime.Now.AddDays(-120))
+                .GreaterThan(DateTime.Now.AddYears(-120))
                 .LessThanOrEqualTo(DateTime.Now).WithMessage("Invalid date.");
 
             RuleFor(p => p.Street)

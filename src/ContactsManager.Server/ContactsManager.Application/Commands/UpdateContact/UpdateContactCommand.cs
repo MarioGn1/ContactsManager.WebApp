@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ContactsManager.Application.Interfaces.Commands;
 
 namespace ContactsManager.Application.Commands.UpdateContact
 {
-    internal class UpdateContactCommand
+    public class UpdateContactCommand : ICommand
     {
     }
 }

@@ -1,4 +1,7 @@
 using ContactsManager.Application.Commands;
+using ContactsManager.Application.Commands.AddContact;
+using ContactsManager.Application.Commands.DeleteContact;
+using ContactsManager.Application.Commands.UpdateContact;
 using ContactsManager.Application.Interfaces.Commands;
 using ContactsManager.Application.Interfaces.Queries;
 using ContactsManager.Application.Queries;
@@ -47,6 +50,12 @@ namespace ContactsManager.WebApp
                 .AddCors()
                 .AddJwtAuthentication(Configuration)
                 .AddControllers();
+
+            //Add Commnad Handlers
+            services
+                .AddScoped<ICommandHandler<AddContactCommand>, AddContactCommandHandler>()
+                .AddScoped<ICommandHandler<DeleteContactCommand>, DeleteContactCommandHandler>()
+                .AddScoped<ICommandHandler<UpdateContactCommand>, UpdateContactCommandHandler>();
 
 
             //Add Query Handlers

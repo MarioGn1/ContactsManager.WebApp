@@ -33,7 +33,7 @@ namespace ContactsManager.Application.Queries.GetById
             {
                 FirstName = contact.FirstName,
                 LastName = contact.LastName,
-                DateOfBirth = contact.DateOfBirth,
+                DateOfBirth = contact.DateOfBirth.ToShortDateString(),
                 PhoneNumber = contact.PhoneNumber,
                 Iban = contact.Iban,
                 City = contact.Address.City,

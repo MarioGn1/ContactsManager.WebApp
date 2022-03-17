@@ -1,4 +1,5 @@
-﻿using ContactsManager.Application.Interfaces.Commands;
+﻿using ContactsManager.Application.Exceptions;
+using ContactsManager.Application.Interfaces.Commands;
 using ContactsManager.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -34,6 +35,7 @@ namespace ContactsManager.Application.Commands.AddContact
 
             var user = data.Users
                 .Include(x => x.Book)
+                .ThenInclude(x => x.Contacts)
                 .FirstOrDefault(x => x.Id == command.OwnerId);            
 
             user.Book.Create(command.FirstName,

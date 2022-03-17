@@ -22,18 +22,20 @@ namespace ContactsManager.Domain.AggregateModel.ContactsAggregate
 
         public Contact GetById(int contactId)
         {
-            return this.contacts.FirstOrDefault(x => x.Id == contactId);
+            return Contacts.FirstOrDefault(x => x.Id == contactId);
         }
 
         public IReadOnlyCollection<Contact> GetByName(string name)
         {
-            var contacts = this.contacts
-                .Where(x => x.FirstName == name || x.LastName == name)
+
+            var sortedContacts = this.contacts
+                .Where(x => x.FirstName.Contains(name, StringComparison.OrdinalIgnoreCase) ||
+                    x.LastName.Contains(name, StringComparison.OrdinalIgnoreCase))
                 .OrderBy(x => x.FirstName)
                 .ToList()
                 .AsReadOnly();
 
-            return Contacts;
+            return sortedContacts;
         }
 
         public Contact Create(string firstName,

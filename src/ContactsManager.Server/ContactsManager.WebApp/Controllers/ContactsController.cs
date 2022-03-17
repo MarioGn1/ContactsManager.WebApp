@@ -1,11 +1,43 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using ContactsManager.Application.Commands;
+using ContactsManager.Application.Commands.AddContact;
+using ContactsManager.Application.Common;
+using ContactsManager.Application.Exceptions;
+using ContactsManager.Application.Interfaces.Commands;
+using ContactsManager.Application.Interfaces.Queries;
+using ContactsManager.Application.Queries;
+using ContactsManager.Application.Queries.GetById;
+using ContactsManager.Application.Queries.GetByName;
+using ContactsManager.Data.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ContactsManager.WebApp.Controllers
 {
     [Authorize]
     public class ContactsController : ApiControler
     {
+        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly ICommandDispatcher commandDispatcher;
+        private readonly IQueryDispatcher queryDispatcher;
+        private readonly UserManager<AppUser> userManager;
+
+        public ContactsController(IHttpContextAccessor httpContextAccessor, UserManager<AppUser> userManager)
+        {
+            this.httpContextAccessor = httpContextAccessor;
+            this.userManager = userManager;
+
+            commandDispatcher = new CommandDispatcher(this.httpContextAccessor.HttpContext.RequestServices);
+            queryDispatcher = new QueryDispatcher(this.httpContextAccessor.HttpContext.RequestServices);
+        }
+
+
+
         [HttpGet]
         [Route("all")]
         public ActionResult<string> GetAll()
@@ -14,17 +46,45 @@ namespace ContactsManager.WebApp.Controllers
         }
 
         [HttpGet]
-        [Route("nameSpecificContacts")]
-        public ActionResult<string> GetByName(string name)
+        [Route("{name}")]
+        public ActionResult GetByName(string name)
         {
-            return "Thats specific cool!";
+            var userId = GetUserId();
+            var result = queryDispatcher.Send(new GetByNameQuery { OwnerId = userId, Name = name });
+            List<ContactDisplay> response = new List<ContactDisplay>();
+            if (result != null && result.Count > 0)
+                foreach (var member in result)
+                {
+                    response.Add((ContactDisplay)member);
+                }
+            return Ok(response);
+        }        
+
+        [HttpGet]
+        [Route("details/{id}")]
+        public ActionResult GetDetails(int id)
+        {
+            var userId = GetUserId();
+            var result = queryDispatcher.SendSingle(new GetByIdQuery { OwnerId = userId, ContactId = id });
+            var response = (ContactDetailsDisplay)result;            
+            return Ok(response);
         }
 
         [HttpPost]
         [Route("create")]
-        public ActionResult<string> CreateContact(string name)
+        public async Task<ActionResult<string>> CreateContact([FromBody]AddContactCommand command)
         {
-            return "Thats create contact!";
+            command.OwnerId = GetUserId();
+            try
+            {
+                await commandDispatcher.Send(command);
+            }
+            catch (CommandException e)
+            {
+                return BadRequest(e.Message);
+            }
+            
+            return Ok("Successfully created.");
         }
 
         [HttpPut]
@@ -41,5 +101,8 @@ namespace ContactsManager.WebApp.Controllers
             this.SignIn(User);
             return "Thats delete contact!";
         }
+
+        private string GetUserId()
+            => User.Identity.Name;
     }
 }

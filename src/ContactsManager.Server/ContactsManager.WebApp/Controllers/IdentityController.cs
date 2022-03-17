@@ -1,4 +1,5 @@
 ﻿using ContactsManager.Data.Models;
+using ContactsManager.Domain.AggregateModel.ContactsAggregate;
 using ContactsManager.WebApp.Models.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -28,10 +29,12 @@ namespace ContactsManager.WebApp.Controllers
         [Route(nameof(Register))]
         public async Task<ActionResult> Register(RegisterRequestModel model)
         {
+            var userContactsBook = new Book();
             var user = new AppUser
             {
                 UserName = model.UserName,
                 Email = model.Email,
+                Book = userContactsBook,
             };
 
             var result = await userManager.CreateAsync(user, model.Password);
