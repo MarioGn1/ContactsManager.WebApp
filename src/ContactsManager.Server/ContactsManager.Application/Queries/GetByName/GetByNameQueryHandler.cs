@@ -23,20 +23,21 @@ namespace ContactsManager.Application.Queries.GetByName
                 .ThenInclude(x => x.Contacts)
                 .FirstOrDefault(x => x.Id == query.OwnerId);
 
-            var filteredContacts = user.Book.GetByName(query.Name);
+            var filteredContacts = user.Book.GetByName(query.Name)
+                .Select(x => new ContactDisplay
+                {
+                    Id = x.Id,
+                    FirstName = x.FirstName,
+                    LastName = x.LastName
+                })
+                .ToList<IResult>();
 
             if (filteredContacts.Count == 0)
             {
                 return null;
             }
 
-            return filteredContacts
-                .Select(x => new ContactDisplay
-                {
-                    FirstName = x.FirstName,
-                    LastName = x.LastName
-                })
-                .ToList<IResult>();
+            return filteredContacts;                
         }
     }
 }

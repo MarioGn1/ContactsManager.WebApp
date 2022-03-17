@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ContactsManager.Application.Commands.AddContact;
 
 namespace ContactsManager.Application.Commands.UpdateContact
 {
-    internal class UpdateContactCommandValidator
+    public class UpdateContactCommandValidator : AddContactCommandValidator
     {
+        public UpdateContactCommandValidator()
+            : base()
+        { }
     }
 }

@@ -31,6 +31,7 @@ namespace ContactsManager.Application.Queries.GetById
 
             return new ContactDetailsDisplay
             {
+                Id = contact.Id,
                 FirstName = contact.FirstName,
                 LastName = contact.LastName,
                 DateOfBirth = contact.DateOfBirth.ToShortDateString(),

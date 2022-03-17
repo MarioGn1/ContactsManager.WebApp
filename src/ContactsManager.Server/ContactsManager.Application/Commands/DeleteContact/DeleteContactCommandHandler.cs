@@ -1,13 +1,36 @@
 ﻿using ContactsManager.Application.Interfaces.Commands;
+using ContactsManager.Data;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ContactsManager.Application.Commands.DeleteContact
 {
     public class DeleteContactCommandHandler : ICommandHandler<DeleteContactCommand>
     {
-        public Task Handle(DeleteContactCommand command)
+        private readonly ContactsManagerDbContext data;
+
+        public DeleteContactCommandHandler(ContactsManagerDbContext data)
         {
-            throw new System.NotImplementedException();
+            this.data = data;
+        }
+
+        public async Task Handle(DeleteContactCommand command)
+        {
+            var user = data.Users
+                .Include(x => x.Book)
+                .ThenInclude(x => x.Contacts)
+                .FirstOrDefault(x => x.Id == command.OwnerId);
+
+            var isExist = user.Book.Contacts.Any(x => x.Id == command.ContactId);
+
+            if (!isExist)
+            {
+                return;
+            }
+            user.Book.Delete(command.ContactId);
+
+            await data.SaveChangesAsync();
         }
     }
 }

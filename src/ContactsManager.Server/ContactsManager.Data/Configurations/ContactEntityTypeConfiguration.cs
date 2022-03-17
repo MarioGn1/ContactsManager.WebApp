@@ -81,7 +81,7 @@ namespace ContactsManager.Data.Configurations
                 .WithMany(c => c.Contacts)
                 .HasForeignKey(c => c.BookId)
                 .IsRequired()
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

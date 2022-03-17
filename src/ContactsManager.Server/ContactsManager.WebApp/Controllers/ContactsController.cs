@@ -1,5 +1,6 @@
 ﻿using ContactsManager.Application.Commands;
 using ContactsManager.Application.Commands.AddContact;
+using ContactsManager.Application.Commands.DeleteContact;
 using ContactsManager.Application.Common;
 using ContactsManager.Application.Exceptions;
 using ContactsManager.Application.Interfaces.Commands;
@@ -80,7 +81,7 @@ namespace ContactsManager.WebApp.Controllers
 
         [HttpPost]
         [Route("create")]
-        public async Task<ActionResult<string>> CreateContact([FromBody]AddContactCommand command)
+        public async Task<ActionResult> CreateContact([FromBody]AddContactCommand command)
         {
             command.OwnerId = GetUserId();
             try
@@ -103,11 +104,20 @@ namespace ContactsManager.WebApp.Controllers
         }
 
         [HttpDelete]
-        [Route("delete")]
-        public ActionResult<string> DeleteContact(string name)
+        [Route("delete/{id}")]
+        public async Task<ActionResult> DeleteContact(int id)
         {
-            this.SignIn(User);
-            return "Thats delete contact!";
+            try
+            {
+                var userId = GetUserId();
+                await commandDispatcher.Send(new DeleteContactCommand { OwnerId = userId, ContactId = id });
+            }
+            catch
+            {
+                return BadRequest();
+            }
+            
+            return Ok("Successfully deleted");
         }
 
         private string GetUserId()

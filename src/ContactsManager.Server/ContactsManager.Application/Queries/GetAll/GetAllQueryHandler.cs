@@ -26,6 +26,7 @@ namespace ContactsManager.Application.Queries.GetAll
             var allContacts = user.Book.Contacts
                 .Select(x => new ContactDisplay
                 {
+                    Id = x.Id,
                     FirstName = x.FirstName,
                     LastName = x.LastName
                 })
