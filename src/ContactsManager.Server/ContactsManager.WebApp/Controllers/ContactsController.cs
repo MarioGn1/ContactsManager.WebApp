@@ -1,6 +1,7 @@
 ﻿using ContactsManager.Application.Commands;
 using ContactsManager.Application.Commands.AddContact;
 using ContactsManager.Application.Commands.DeleteContact;
+using ContactsManager.Application.Commands.UpdateContact;
 using ContactsManager.Application.Common;
 using ContactsManager.Application.Exceptions;
 using ContactsManager.Application.Interfaces.Commands;
@@ -98,9 +99,19 @@ namespace ContactsManager.WebApp.Controllers
 
         [HttpPut]
         [Route("update")]
-        public ActionResult<string> UpdateContact(string name)
+        public async Task<ActionResult> UpdateContact([FromBody]UpdateContactCommand command)
         {
-            return "Thats update contact!";
+            command.OwnerId = GetUserId();
+            try
+            {
+                await commandDispatcher.Send(command);
+            }
+            catch (CommandException e)
+            {
+                return BadRequest(e.Message);
+            }
+
+            return Ok("Successfully updated.");
         }
 
         [HttpDelete]

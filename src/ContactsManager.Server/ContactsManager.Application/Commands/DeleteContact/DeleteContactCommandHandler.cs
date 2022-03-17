@@ -1,4 +1,5 @@
-﻿using ContactsManager.Application.Interfaces.Commands;
+﻿using ContactsManager.Application.Exceptions;
+using ContactsManager.Application.Interfaces.Commands;
 using ContactsManager.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -26,7 +27,7 @@ namespace ContactsManager.Application.Commands.DeleteContact
 
             if (!isExist)
             {
-                return;
+                throw new CommandException("Not existent contact Id.");
             }
             user.Book.Delete(command.ContactId);
 

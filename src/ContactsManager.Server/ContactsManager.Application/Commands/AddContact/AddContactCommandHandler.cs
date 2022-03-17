@@ -21,7 +21,7 @@ namespace ContactsManager.Application.Commands.AddContact
 
         public async Task Handle(AddContactCommand command)
         {
-            var validator = new AddContactCommandValidator();
+            var validator = new ContactCommandValidator();
             var result = validator.Validate(command);
             bool validationSucceeded = result.IsValid;
 

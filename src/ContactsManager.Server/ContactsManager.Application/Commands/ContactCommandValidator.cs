@@ -2,11 +2,11 @@
 using System;
 using static ContactsManager.Constants.Domain.Contact;
 
-namespace ContactsManager.Application.Commands.AddContact
+namespace ContactsManager.Application.Commands
 {
-    public class AddContactCommandValidator : AbstractValidator<AddContactCommand>
+    public class ContactCommandValidator : AbstractValidator<ContactCommand>
     {
-        public AddContactCommandValidator()
+        public ContactCommandValidator()
         {
             RuleFor(p => p.FirstName)
                 .NotNull()
