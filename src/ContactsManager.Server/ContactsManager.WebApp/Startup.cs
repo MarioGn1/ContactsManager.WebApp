@@ -19,6 +19,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
+using System.Linq;
 
 namespace ContactsManager.WebApp
 {
@@ -38,6 +40,12 @@ namespace ContactsManager.WebApp
             services
                 .AddTransient<ISqlExecutor> (options => 
                     new SqlExecutor(Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ContactsManager.WebApp", Version = "v1" });
+                c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+            });
 
             services
                 .AddIdentity<AppUser, IdentityRole>(options =>
@@ -83,7 +91,7 @@ namespace ContactsManager.WebApp
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseMigrationsEndPoint();
+                app.UseMigrationsEndPoint();                
             }
             else
             {
@@ -100,6 +108,10 @@ namespace ContactsManager.WebApp
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ContactsManager.WebApp v1"));
 
             app.UseEndpoints(endpoints =>
             {

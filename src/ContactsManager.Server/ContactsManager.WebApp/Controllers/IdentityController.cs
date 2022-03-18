@@ -47,6 +47,7 @@ namespace ContactsManager.WebApp.Controllers
             return BadRequest(result.Errors);
         }
 
+        [HttpGet]
         [Route(nameof(Login))]
         public async Task<ActionResult<string>> Login(LoginRequestModel model)
         {
