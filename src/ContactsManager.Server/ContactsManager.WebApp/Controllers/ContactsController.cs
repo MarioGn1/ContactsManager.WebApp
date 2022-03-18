@@ -28,12 +28,10 @@ namespace ContactsManager.WebApp.Controllers
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly ICommandDispatcher commandDispatcher;
         private readonly IQueryDispatcher queryDispatcher;
-        private readonly UserManager<AppUser> userManager;
 
-        public ContactsController(IHttpContextAccessor httpContextAccessor, UserManager<AppUser> userManager)
+        public ContactsController(IHttpContextAccessor httpContextAccessor)
         {
             this.httpContextAccessor = httpContextAccessor;
-            this.userManager = userManager;
 
             commandDispatcher = new CommandDispatcher(this.httpContextAccessor.HttpContext.RequestServices);
             queryDispatcher = new QueryDispatcher(this.httpContextAccessor.HttpContext.RequestServices);
@@ -72,10 +70,10 @@ namespace ContactsManager.WebApp.Controllers
 
         [HttpGet]
         [Route("details/{id}")]
-        public ActionResult GetDetails(int id)
+        public async Task<ActionResult> GetDetails(int id)
         {
             var userId = GetUserId();
-            var result = queryDispatcher.SendSingle(new GetByIdQuery { OwnerId = userId, ContactId = id });
+            var result = await queryDispatcher.SendSingle(new GetByIdQuery { OwnerId = userId, ContactId = id });
             var response = (ContactDetailsDisplay)result;            
             return Ok(response);
         }

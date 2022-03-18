@@ -1,49 +1,56 @@
 ﻿using ContactsManager.Application.Common;
 using ContactsManager.Application.Interfaces.Queries;
+using ContactsManager.Application.Queries.Utils;
 using ContactsManager.Data;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+
+using static ContactsManager.Application.Queries.Utils.SqlQueries;
 
 namespace ContactsManager.Application.Queries.GetByName
 {
     public class GetByNameQueryHandler : IQueryHandler<GetByNameQuery>
     {
-        private readonly ContactsManagerDbContext data;
+        private readonly ISqlExecutor sqlExecutor;
 
-        public GetByNameQueryHandler(ContactsManagerDbContext data)
+        public GetByNameQueryHandler(ISqlExecutor sqlExecutor)
         {
-            this.data = data;
+            this.sqlExecutor = sqlExecutor;
         }
 
-        public IList<IResult> Handle(GetByNameQuery query)
+        public async Task<IList<IResult>> Handle(GetByNameQuery query)
         {
-            var user = data.Users
-                .Include(x => x.Book)
-                .ThenInclude(x => x.Contacts)
-                .FirstOrDefault(x => x.Id == query.OwnerId);
+            var result = new List<IResult>();
 
-            var filteredContacts = user.Book.GetByName(query.Name)
-                .Select(x => new ContactDisplay
+            using (SqlConnection connection = new SqlConnection(sqlExecutor.DatabaseConnectionString))
+            {
+                connection.Open();
+
+                Dictionary<string, object> parameters = new Dictionary<string, object>();
+                parameters.Add("userId", query.OwnerId);
+                parameters.Add("name", "%" + query.Name + "%");
+
+                var reader = await sqlExecutor.ExecuteReader(connection, getByNameQuery, parameters);
+
+                while (reader.Read())
                 {
-                    Id = x.Id,
-                    FirstName = x.FirstName,
-                    LastName = x.LastName
-                })
-                .ToList<IResult>();
+                    var currContact = new ContactDisplay
+                    {
+                        Id = (int)reader["Id"],
+                        FirstName = reader["FirstName"] as string,
+                        LastName = reader["LastName"] as string
+                    };
+                    result.Add(currContact);
+                }
+            }
 
-            if (filteredContacts.Count == 0)
+            if (result.Count == 0)
             {
                 return null;
             }
 
-            return filteredContacts;                
-        }
-
-        Task<IList<IResult>> IQueryHandler<GetByNameQuery>.Handle(GetByNameQuery query)
-        {
-            throw new System.NotImplementedException();
+            return result;
         }
     }
 }

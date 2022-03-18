@@ -1,48 +1,63 @@
 ﻿using ContactsManager.Application.Common;
 using ContactsManager.Application.Interfaces.Queries;
-using ContactsManager.Data;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
+using ContactsManager.Application.Queries.Utils;
+using Microsoft.Data.SqlClient;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using static ContactsManager.Application.Queries.Utils.SqlQueries;
 
 namespace ContactsManager.Application.Queries.GetById
 {
     public class GetByIdQueryHandler : ISingleResultQueryHandler<GetByIdQuery>
     {
-        private readonly ContactsManagerDbContext data;
+        private readonly ISqlExecutor sqlExecutor;
 
-        public GetByIdQueryHandler(ContactsManagerDbContext data)
+        public GetByIdQueryHandler(ISqlExecutor sqlExecutor)
         {
-            this.data = data;
+            this.sqlExecutor = sqlExecutor;
         }
 
-        public IResult Handle(GetByIdQuery query)
+        public async Task<IResult> Handle(GetByIdQuery query)
         {
-            var user = data.Users
-                .Include(x => x.Book)
-                .ThenInclude(x => x.Contacts)
-                .FirstOrDefault(x => x.Id == query.OwnerId);
+            var result = new ContactDetailsDisplay();
 
-            var contact = user.Book.GetById(query.ContactId);
+            using (SqlConnection connection = new SqlConnection(sqlExecutor.DatabaseConnectionString))
+            {
+                connection.Open();
 
-            if (contact == null)
+                Dictionary<string, object> parameters = new Dictionary<string, object>();
+                parameters.Add("userId", query.OwnerId);
+                parameters.Add("contactId", query.ContactId);
+
+                var reader = await sqlExecutor.ExecuteReader(connection, getByIdQuery, parameters);
+
+                if (reader.Read())
+                {
+                    result.Id = (int)reader["Id"];
+                    result.FirstName = reader["FirstName"] as string;
+                    result.LastName = reader["LastName"] as string;
+                    result.DateOfBirth = ((DateTime)reader["DateOfBirth"]).ToShortDateString();
+                    result.PhoneNumber = reader["PhoneNumber"] as string;
+                    result.Iban = reader["IBAN"] as string;
+                    result.Street = reader["Street"] as string;
+                    result.City = reader["City"] as string;
+                    result.State = reader["State"] as string;
+                    result.Country = reader["Country"] as string;
+                    result.ZipCode = reader["ZipCode"] as string;
+                }
+                else
+                {
+                    result = null;
+                }
+            }
+
+            if (result == null)
             {
                 return null;
             }
 
-            return new ContactDetailsDisplay
-            {
-                Id = contact.Id,
-                FirstName = contact.FirstName,
-                LastName = contact.LastName,
-                DateOfBirth = contact.DateOfBirth.ToShortDateString(),
-                PhoneNumber = contact.PhoneNumber,
-                Iban = contact.Iban,
-                City = contact.Address.City,
-                Street = contact.Address.Street,
-                Country = contact.Address.Country,
-                State = contact.Address.State,
-                ZipCode = contact.Address.ZipCode,
-            };
+            return result;
         }
     }
 }

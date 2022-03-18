@@ -24,11 +24,11 @@ namespace ContactsManager.Application.Queries
                 throw new QueryException($"Query handler {query.GetType().Name} does not exist");
         }
 
-        public IResult SendSingle<T>(T query) where T : IQuery
+        public async Task<IResult> SendSingle<T>(T query) where T : IQuery
         {
             var handler = services.GetService(typeof(ISingleResultQueryHandler<T>));
             if (handler != null)
-                return ((ISingleResultQueryHandler<T>)handler).Handle(query);
+                return  await ((ISingleResultQueryHandler<T>)handler).Handle(query);
             else
                 throw new QueryException($"Query handler {query.GetType().Name} does not exist");
         }

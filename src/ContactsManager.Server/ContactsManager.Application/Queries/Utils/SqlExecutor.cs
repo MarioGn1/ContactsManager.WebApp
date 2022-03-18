@@ -44,13 +44,6 @@ namespace ContactsManager.Application.Queries.Utils
             }
         }
 
-        public async Task<object> ExecuteScalar(SqlConnection connection, string query, Dictionary<string, object> parameters)
-        {
-            var command = new SqlCommand(query, connection);
-            SetParameters(command, parameters);
-            return await command.ExecuteScalarAsync();
-        }
-
         private void SetParameters(SqlCommand command, Dictionary<string, object> parameters)
         {
             foreach (var item in parameters)

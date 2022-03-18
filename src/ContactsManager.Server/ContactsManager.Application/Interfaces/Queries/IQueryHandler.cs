@@ -14,6 +14,6 @@ namespace ContactsManager.Application.Interfaces.Queries
 
     public interface ISingleResultQueryHandler<T> : IQueryHandler where T : IQuery
     {
-        IResult Handle(T query);
+        Task<IResult> Handle(T query);
     }
 }
