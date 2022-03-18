@@ -74,6 +74,10 @@ namespace ContactsManager.WebApp.Controllers
         {
             var userId = GetUserId();
             var result = await queryDispatcher.SendSingle(new GetByIdQuery { OwnerId = userId, ContactId = id });
+            if (result == null)
+            {
+                return BadRequest("Contact not found.");
+            }
             var response = (ContactDetailsDisplay)result;            
             return Ok(response);
         }

@@ -35,14 +35,21 @@ namespace ContactsManager.Application.Queries.GetByName
 
                 while (reader.Read())
                 {
-                    var currContact = new ContactDisplay
+                    try
                     {
-                        Id = (int)reader["Id"],
-                        FirstName = reader["FirstName"] as string,
-                        LastName = reader["LastName"] as string
-                    };
-                    result.Add(currContact);
-                }
+                        var currContact = new ContactDisplay
+                        {
+                            Id = (int)reader["Id"],
+                            FirstName = reader["FirstName"] as string,
+                            LastName = reader["LastName"] as string
+                        };
+                        result.Add(currContact);
+                    }
+                    catch
+                    {
+                        return null;
+                    }
+                }                
             }
 
             if (result.Count == 0)

@@ -1,11 +1,8 @@
 ﻿using ContactsManager.Application.Common;
 using ContactsManager.Application.Interfaces.Queries;
 using ContactsManager.Application.Queries.Utils;
-using ContactsManager.Data;
 using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using static ContactsManager.Application.Queries.Utils.SqlQueries;
 
@@ -35,13 +32,21 @@ namespace ContactsManager.Application.Queries.GetAll
 
                 while (reader.Read())
                 {
-                    var currContact = new ContactDisplay
+                    try
                     {
-                        Id = (int)reader["Id"],
-                        FirstName = reader["FirstName"] as string,
-                        LastName = reader["LastName"] as string
-                    };
-                    result.Add(currContact);
+                        var currContact = new ContactDisplay
+                        {
+                            Id = (int)reader["Id"],
+                            FirstName = reader["FirstName"] as string,
+                            LastName = reader["LastName"] as string
+                        };
+                        result.Add(currContact);
+                    }
+                    catch
+                    {
+                        return null;
+                    }
+                    
                 }
             }
 

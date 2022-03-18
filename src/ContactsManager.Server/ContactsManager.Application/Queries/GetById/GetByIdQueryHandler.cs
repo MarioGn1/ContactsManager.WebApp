@@ -32,23 +32,30 @@ namespace ContactsManager.Application.Queries.GetById
 
                 var reader = await sqlExecutor.ExecuteReader(connection, getByIdQuery, parameters);
 
-                if (reader.Read())
+                try
                 {
-                    result.Id = (int)reader["Id"];
-                    result.FirstName = reader["FirstName"] as string;
-                    result.LastName = reader["LastName"] as string;
-                    result.DateOfBirth = ((DateTime)reader["DateOfBirth"]).ToShortDateString();
-                    result.PhoneNumber = reader["PhoneNumber"] as string;
-                    result.Iban = reader["IBAN"] as string;
-                    result.Street = reader["Street"] as string;
-                    result.City = reader["City"] as string;
-                    result.State = reader["State"] as string;
-                    result.Country = reader["Country"] as string;
-                    result.ZipCode = reader["ZipCode"] as string;
+                    if (reader.Read())
+                    {
+                        result.Id = (int)reader["Id"];
+                        result.FirstName = reader["FirstName"] as string;
+                        result.LastName = reader["LastName"] as string;
+                        result.DateOfBirth = ((DateTime)reader["DateOfBirth"]).ToShortDateString();
+                        result.PhoneNumber = reader["PhoneNumber"] as string;
+                        result.Iban = reader["IBAN"] as string;
+                        result.Street = reader["Street"] as string;
+                        result.City = reader["City"] as string;
+                        result.State = reader["State"] as string;
+                        result.Country = reader["Country"] as string;
+                        result.ZipCode = reader["ZipCode"] as string;
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
-                else
+                catch
                 {
-                    result = null;
+                    return null;
                 }
             }
 

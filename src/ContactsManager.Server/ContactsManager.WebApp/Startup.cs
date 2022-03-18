@@ -12,6 +12,7 @@ using ContactsManager.Application.Queries.Utils;
 using ContactsManager.Data;
 using ContactsManager.Data.Models;
 using ContactsManager.WebApp.Infrastructure;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -20,6 +21,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using System;
 using System.Linq;
 
 namespace ContactsManager.WebApp
@@ -38,13 +40,36 @@ namespace ContactsManager.WebApp
                     .UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services
-                .AddTransient<ISqlExecutor> (options => 
-                    new SqlExecutor(Configuration.GetConnectionString("DefaultConnection")));
+                .AddTransient<ISqlExecutor>(options =>
+                   new SqlExecutor(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ContactsManager.WebApp", Version = "v1" });
                 c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+
+                var jwtSecurityScheme = new OpenApiSecurityScheme
+                {
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    Name = "JWT Authentication",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Description = "Put **_ONLY_** your JWT Bearer token on textbox below!",
+
+                    Reference = new OpenApiReference
+                    {
+                        Id = JwtBearerDefaults.AuthenticationScheme,
+                        Type = ReferenceType.SecurityScheme
+                    }
+                };
+
+                c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    { jwtSecurityScheme, Array.Empty<string>() }
+                });
             });
 
             services
@@ -91,7 +116,7 @@ namespace ContactsManager.WebApp
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseMigrationsEndPoint();                
+                app.UseMigrationsEndPoint();
             }
             else
             {
