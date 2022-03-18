@@ -2,6 +2,7 @@
 using ContactsManager.Application.Interfaces.Queries;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ContactsManager.Application.Queries
 {
@@ -14,11 +15,11 @@ namespace ContactsManager.Application.Queries
             this.services = services;
         }
 
-        public IList<IResult> Send<T>(T query) where T : IQuery
+        public async Task<IList<IResult>> Send<T>(T query) where T : IQuery
         {
             var handler = services.GetService(typeof(IQueryHandler<T>));
             if (handler != null)
-                return ((IQueryHandler<T>)handler).Handle(query);
+                return await ((IQueryHandler<T>)handler).Handle(query);
             else
                 throw new QueryException($"Query handler {query.GetType().Name} does not exist");
         }

@@ -42,10 +42,10 @@ namespace ContactsManager.WebApp.Controllers
 
 
         [HttpGet]
-        public ActionResult<string> GetAll()
+        public async Task<ActionResult<string>> GetAll()
         {
             var userId = GetUserId();
-            var result = queryDispatcher.Send(new GetAllQuery { OwnerId = userId});
+            var result = await queryDispatcher.Send(new GetAllQuery { OwnerId = userId});
             List<ContactDisplay> response = new List<ContactDisplay>();
             if (result != null && result.Count > 0)
                 foreach (var member in result)
@@ -57,10 +57,10 @@ namespace ContactsManager.WebApp.Controllers
 
         [HttpGet]
         [Route("{name}")]
-        public ActionResult GetByName(string name)
+        public async Task<ActionResult> GetByName(string name)
         {
             var userId = GetUserId();
-            var result = queryDispatcher.Send(new GetByNameQuery { OwnerId = userId, Name = name });
+            var result = await queryDispatcher.Send(new GetByNameQuery { OwnerId = userId, Name = name });
             List<ContactDisplay> response = new List<ContactDisplay>();
             if (result != null && result.Count > 0)
                 foreach (var member in result)

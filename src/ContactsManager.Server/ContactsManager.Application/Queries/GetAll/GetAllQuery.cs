@@ -3,7 +3,7 @@
 namespace ContactsManager.Application.Queries.GetAll
 {
     public class GetAllQuery : IQuery
-    {
+    {        
         public string OwnerId { get; set; }
     }
 }

@@ -8,6 +8,7 @@ using ContactsManager.Application.Queries;
 using ContactsManager.Application.Queries.GetAll;
 using ContactsManager.Application.Queries.GetById;
 using ContactsManager.Application.Queries.GetByName;
+using ContactsManager.Application.Queries.Utils;
 using ContactsManager.Data;
 using ContactsManager.Data.Models;
 using ContactsManager.WebApp.Infrastructure;
@@ -33,6 +34,10 @@ namespace ContactsManager.WebApp
             services
                 .AddDbContext<ContactsManagerDbContext>(options => options
                     .UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            services
+                .AddTransient<ISqlExecutor> (options => 
+                    new SqlExecutor(Configuration.GetConnectionString("DefaultConnection")));
 
             services
                 .AddIdentity<AppUser, IdentityRole>(options =>

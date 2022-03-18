@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ContactsManager.Application.Interfaces.Queries
 {
@@ -8,7 +9,7 @@ namespace ContactsManager.Application.Interfaces.Queries
 
     public interface IQueryHandler<T> : IQueryHandler where T : IQuery
     {
-        IList<IResult> Handle(T query);        
+        Task<IList<IResult>> Handle(T query);        
     }
 
     public interface ISingleResultQueryHandler<T> : IQueryHandler where T : IQuery

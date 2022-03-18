@@ -4,6 +4,7 @@ using ContactsManager.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ContactsManager.Application.Queries.GetByName
 {
@@ -38,6 +39,11 @@ namespace ContactsManager.Application.Queries.GetByName
             }
 
             return filteredContacts;                
+        }
+
+        Task<IList<IResult>> IQueryHandler<GetByNameQuery>.Handle(GetByNameQuery query)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
