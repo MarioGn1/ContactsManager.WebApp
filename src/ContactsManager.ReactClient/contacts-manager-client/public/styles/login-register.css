@@ -128,7 +128,7 @@ label[for="terms"]>input {
     #register-page {
         position: relative;
         width: 400px;
-        height: 400px;
+        height: 500px;
         border-radius: 20px;
         padding: 20px;
         box-sizing: border-box;
@@ -189,9 +189,9 @@ label[for="terms"]>input {
     .field>span {
         position: absolute;
         font-size: 18px;
-        bottom: 50px;
+        bottom: 87%;
         right: 50%;
-        transform: translate(50%, 50%);
+        transform: translate(50%, 100%);
         text-decoration: none;
         color: black;
         background: rgb(235, 157, 142);

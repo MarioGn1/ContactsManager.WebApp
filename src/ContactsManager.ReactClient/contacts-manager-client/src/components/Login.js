@@ -1,24 +1,21 @@
 import { useNavigate, NavLink } from 'react-router-dom';
 
 
-const Login = ({
-    history
-}) => {
-    let historyHook = useNavigate();
+const Login = () => {
+    let navigate = useNavigate();
 
-    const onFormSubmit = (e) => {
+    const submit = (e) => {
         e.preventDefault();
 
         // TODO: Login
 
-        history.push('/')
-        // historyHook.push('/games');
+        navigate('/');
     };
 
     return (
         <>
             <section id="login-page" className="auth">
-                <form id="login" onSubmit={onFormSubmit}>
+                <form id="login" onSubmit={submit}>
 
                     <div className="container">
                         <div className="brand-logo"></div>
@@ -34,7 +31,7 @@ const Login = ({
                 </form>
             </section>
             <p className="field">
-                <span>If you don't have profile click <NavLink activeClassName="active-navigation-link" to="/register">here</NavLink></span>
+                <span>If you don't have profile click <NavLink className="active-navigation-link" to="/register">here</NavLink></span>
             </p>
         </>
 
